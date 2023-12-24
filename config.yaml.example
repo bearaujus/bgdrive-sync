@@ -1,0 +1,8 @@
+target_path: "test"
+# google drive sync output folder id. when empty, will replicate your local files to the root directory of your google drive
+root_folder_id: ""
+delay_hour: 5
+sync_worker: 30
+sync_retry: 3
+test_mode: false
+test_mode_op_delay_ms: 300
