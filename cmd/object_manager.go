@@ -144,9 +144,9 @@ func (om *ObjectManager) NewObject(loc string) (*Object, bool, bool, error) {
 	if !stored {
 		return pObj, false, true, nil
 	}
-	execArgs := fmt.Sprintf("cd %v && gdrive files %v %v --parent %v --print-only-id", d, op, b, pObj.GDId)
+	execArgs := fmt.Sprintf(`cd '%v' && gdrive files '%v' '%v' --parent '%v' --print-only-id`, d, op, b, pObj.GDId)
 	if pObj.GDId == "." {
-		execArgs = fmt.Sprintf("cd %v && gdrive files %v %v --print-only-id", d, op, b)
+		execArgs = fmt.Sprintf("cd '%v' && gdrive files '%v' '%v' --print-only-id", d, op, b)
 	}
 
 	var nGDId string
@@ -197,7 +197,7 @@ func (om *ObjectManager) UpdateObjectIfModTimeChanged(wr *WalkResp, object *Obje
 	}
 
 	d, b := filepath.Dir(wr.loc), filepath.Base(wr.loc)
-	_, err := om.execCommand("sh", "-c", fmt.Sprintf("cd %v && gdrive files update %v %v", d, object.GDId, b))
+	_, err := om.execCommand("sh", "-c", fmt.Sprintf("cd '%v' && gdrive files update '%v' '%v'", d, object.GDId, b))
 	if err != nil {
 		return false, nil
 	}
