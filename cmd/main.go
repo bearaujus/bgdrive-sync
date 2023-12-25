@@ -5,6 +5,7 @@ import (
 	"github.com/bearaujus/bworker/pool"
 	"gopkg.in/yaml.v2"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"sync"
 	"time"
@@ -12,13 +13,16 @@ import (
 
 type (
 	Config struct {
-		TargetPath            string `yaml:"target_path"`
-		RootFolderID          string `yaml:"root_folder_id"`
-		DelayMinute           int    `yaml:"delay_minute"`
-		SyncWorker            int    `yaml:"sync_worker"`
-		SyncRetry             int    `yaml:"sync_retry"`
-		TestMode              bool   `yaml:"test_mode"`
-		TestModeOpDelayMillis int    `yaml:"test_mode_op_delay_ms"`
+		GDAccountName  string `yaml:"gd_account_name"`
+		GDRootFolderID string `yaml:"gd_root_folder_id"`
+
+		SyncTargetPath  string `yaml:"sync_target_path"`
+		SyncDelayMinute int    `yaml:"sync_delay_minute"`
+		SyncWorker      int    `yaml:"sync_worker"`
+		SyncRetry       int    `yaml:"sync_retry"`
+
+		TestMode              bool `yaml:"test_mode"`
+		TestModeOpDelayMillis int  `yaml:"test_mode_op_delay_ms"`
 	}
 )
 
@@ -34,13 +38,18 @@ func main() {
 		panic(err)
 	}
 
+	err = exec.Command("gdrive", "account", "switch", cfg.GDAccountName).Run()
+	if err != nil {
+		panic(err)
+	}
+
 	om, err := NewObjectManager(&cfg)
 	if err != nil {
 		panic(err)
 	}
 
 	for {
-		delay := time.Duration(cfg.DelayMinute) * time.Minute
+		delay := time.Duration(cfg.SyncDelayMinute) * time.Minute
 		fmt.Println("Syncing...")
 
 		err = syncFiles(&cfg, om)
@@ -70,7 +79,7 @@ func syncFiles(cfg *Config, om *ObjectManager) error {
 	ntrLock := sync.Mutex{}
 
 	var tr []WalkResp
-	if err := filepath.Walk(cfg.TargetPath, func(loc string, info os.FileInfo, err error) error {
+	if err := filepath.Walk(cfg.SyncTargetPath, func(loc string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -121,7 +130,7 @@ func syncFiles(cfg *Config, om *ObjectManager) error {
 	}
 
 	deletedQueue := om.CopyObjects()
-	if err := filepath.Walk(cfg.TargetPath, func(loc string, info os.FileInfo, err error) error {
+	if err := filepath.Walk(cfg.SyncTargetPath, func(loc string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}

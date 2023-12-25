@@ -56,11 +56,11 @@ func (om *ObjectManager) updateStoredObject(o *Object, f func(o *Object)) *Objec
 func (om *ObjectManager) loadObject(key string) (*Object, bool) {
 	om.objectMapRWMu.RLock()
 	defer om.objectMapRWMu.RUnlock()
-	if strings.TrimPrefix(strings.TrimSuffix(key, "/"), "/") == strings.TrimPrefix(strings.TrimSuffix(om.cfg.TargetPath, "/"), "/") {
-		if om.cfg.RootFolderID == "" {
-			om.cfg.RootFolderID = "."
+	if strings.TrimPrefix(strings.TrimSuffix(key, "/"), "/") == strings.TrimPrefix(strings.TrimSuffix(om.cfg.SyncTargetPath, "/"), "/") {
+		if om.cfg.GDRootFolderID == "" {
+			om.cfg.GDRootFolderID = "."
 		}
-		return &Object{GDId: om.cfg.RootFolderID}, true
+		return &Object{GDId: om.cfg.GDRootFolderID}, true
 	}
 	object, loaded := om.objectMap[key]
 	return object, loaded
@@ -163,7 +163,7 @@ func (om *ObjectManager) NewObject(loc string) (*Object, bool, bool, error) {
 	if op == "upload" {
 		op = "created"
 	}
-	fmt.Printf("%v: %v (%v)\n", op, strings.TrimPrefix(loc, om.cfg.TargetPath), getFileSizeFormatted(wr.Size()))
+	fmt.Printf("%v: %v (%v)\n", op, strings.TrimPrefix(loc, om.cfg.SyncTargetPath), getFileSizeFormatted(wr.Size()))
 
 	return nObject, false, false, nil
 }
@@ -208,7 +208,7 @@ func (om *ObjectManager) UpdateObjectIfModTimeChanged(wr *WalkResp, object *Obje
 		o.Size = wr.size
 	})
 
-	fmt.Printf("updated: %v (%v -> %v)\n", strings.TrimPrefix(wr.loc, om.cfg.TargetPath), getFileSizeFormatted(originSize), getFileSizeFormatted(wr.size))
+	fmt.Printf("updated: %v (%v -> %v)\n", strings.TrimPrefix(wr.loc, om.cfg.SyncTargetPath), getFileSizeFormatted(originSize), getFileSizeFormatted(wr.size))
 	return true, nil
 }
 
@@ -236,7 +236,7 @@ func NewObjectManager(cfg *Config) (*ObjectManager, error) {
 func (om *ObjectManager) DeleteObjectGDrive(loc string, object *Object) {
 	defer om.deleteObject(loc)
 	_, _ = om.execCommand("gdrive", "files", "delete", object.GDId, "--recursive")
-	fmt.Printf("deleted: %v (%v)\n", strings.TrimPrefix(loc, om.cfg.TargetPath), getFileSizeFormatted(object.Size))
+	fmt.Printf("deleted: %v (%v)\n", strings.TrimPrefix(loc, om.cfg.SyncTargetPath), getFileSizeFormatted(object.Size))
 }
 
 func readObjectMap(sourceLoc string) ([]byte, error) {

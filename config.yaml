@@ -1,7 +1,10 @@
-target_path: "bin/"
-root_folder_id: "0ACR-6T834uGQUk9PVA"
-delay_minute: 5
-sync_worker: 30
-sync_retry: 3
+gd_account_name: "haryobagasasyafah6@gmail"
+gd_root_folder_id: "0ACR-6T834uGQUk9PVA"
+
+sync_target_path: "/home/bearaujus/minecraft-server"
+sync_delay_minute: 300
+sync_worker: 50
+sync_retry: 5
+
 test_mode: false
 test_mode_op_delay_ms: 300
