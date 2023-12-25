@@ -3,4 +3,5 @@
 **/.DS_Store
 **/object_map.json
 **/test
+**/config.yaml
 bin

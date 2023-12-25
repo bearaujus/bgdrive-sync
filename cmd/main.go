@@ -38,7 +38,10 @@ func main() {
 		panic(err)
 	}
 
-	err = exec.Command("gdrive", "account", "switch", cfg.GDAccountName).Run()
+	cmd := exec.Command("gdrive", "account", "switch", cfg.GDAccountName)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stdout
+	err = cmd.Run()
 	if err != nil {
 		panic(err)
 	}
