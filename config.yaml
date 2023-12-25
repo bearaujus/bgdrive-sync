@@ -1,6 +1,6 @@
 target_path: "bin/"
 root_folder_id: "0ACR-6T834uGQUk9PVA"
-delay_hour: 5
+delay_minute: 5
 sync_worker: 30
 sync_retry: 3
 test_mode: false

@@ -14,7 +14,7 @@ type (
 	Config struct {
 		TargetPath            string `yaml:"target_path"`
 		RootFolderID          string `yaml:"root_folder_id"`
-		DelayHour             int    `yaml:"delay_hour"`
+		DelayMinute           int    `yaml:"delay_minute"`
 		SyncWorker            int    `yaml:"sync_worker"`
 		SyncRetry             int    `yaml:"sync_retry"`
 		TestMode              bool   `yaml:"test_mode"`
@@ -40,7 +40,7 @@ func main() {
 	}
 
 	for {
-		delay := time.Second * 2
+		delay := time.Duration(cfg.DelayMinute) * time.Minute
 		fmt.Println("Syncing...")
 
 		err = syncFiles(&cfg, om)
