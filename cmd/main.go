@@ -10,16 +10,6 @@ import (
 	"time"
 )
 
-var binPath string
-
-func init() {
-	executablePath, err := os.Executable()
-	if err != nil {
-		panic(err)
-	}
-	binPath = filepath.Dir(executablePath)
-}
-
 type (
 	Config struct {
 		TargetPath            string `yaml:"target_path"`
@@ -33,7 +23,7 @@ type (
 )
 
 func main() {
-	cfgRaw, err := os.ReadFile(filepath.Join(binPath, "config.yaml"))
+	cfgRaw, err := os.ReadFile("config.yaml")
 	if err != nil {
 		panic(err)
 	}
@@ -80,7 +70,7 @@ func syncFiles(cfg *Config, om *ObjectManager) error {
 	ntrLock := sync.Mutex{}
 
 	var tr []WalkResp
-	if err := filepath.Walk(filepath.Join(binPath, cfg.TargetPath), func(loc string, info os.FileInfo, err error) error {
+	if err := filepath.Walk(cfg.TargetPath, func(loc string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -131,7 +121,7 @@ func syncFiles(cfg *Config, om *ObjectManager) error {
 	}
 
 	deletedQueue := om.CopyObjects()
-	if err := filepath.Walk(filepath.Join(binPath, cfg.TargetPath), func(loc string, info os.FileInfo, err error) error {
+	if err := filepath.Walk(cfg.TargetPath, func(loc string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
